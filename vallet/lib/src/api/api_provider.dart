@@ -2,7 +2,7 @@ part of vallet;
 
 
 class ApiProvider {
-final String host = 'http://10.0.2.2:8000';
+final String host = 'http://127.0.0.1:8000';
 
   Client client = Client();
 
@@ -11,7 +11,6 @@ final String host = 'http://10.0.2.2:8000';
     if (response.statusCode == 200) {
       String body  = response.body;
       user = json.decode(body);
-      print(body);
       return  User.fromJson(json.decode(body));
     }
     else {

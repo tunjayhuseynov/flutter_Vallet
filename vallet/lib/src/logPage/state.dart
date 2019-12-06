@@ -17,7 +17,7 @@ class LogState extends State<Log> {
               children: <Widget>[
                 Text(
                   "Vallet",
-                  style: TextStyle(fontSize: 50, fontFamily: "Lobster"),
+                  style: TextStyle(fontSize: 50, fontFamily: "SF", fontWeight: FontWeight.w400),
                 ),
                 Padding(
                   padding: EdgeInsets.all(15),

@@ -5,8 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Datetime;
+use App\Events\NewMessageNotification;
+
 class Mobile extends Controller
 {
+
+ 
+    public function send()
+    {
+        // ...
+         
+        // message is being sent
+
+         
+        // want to broadcast NewMessageNotification event
+        event(new NewMessageNotification("Limit and Low budget Notification"));
+         
+        return "Notification is sent";
+    }
+
     public function Enter(Request $request)
     {
         $username = $request->route("username");
@@ -31,6 +48,12 @@ class Mobile extends Controller
         ->where("activities.userId", $user->id)
         ->get();
         
+        $card = DB::table('bankcards')
+        ->join('cardtypes', 'bankcards.cardTypeId', '=','cardtypes.id')
+        ->select('bankcards.*','cardtypes.type AS name')
+        ->where("bankcards.userId", $user->id)
+        ->get();
+
         $weekdate = new DateTime('-1 week');
         $weekdate = $weekdate->format('Y-m-d H:i:s');
         
@@ -56,7 +79,8 @@ class Mobile extends Controller
         $monthTransfer = $monthTrans->where("categoryId", 2)->sum("money");
         $monthShoping = $monthTrans->where("categoryId", 3)->sum("money");
 
-
+        $user->cards = $card;
+        $user->countcards = count($card);
         $user->today = array('withdraw' => $dayWithdraw, 'transfer' => $dayTransfer, 'shoping' => $dayShoping);
         $user->month = array('withdraw' => $monthWithdraw, 'transfer' => $monthTransfer, 'shoping' => $monthShoping);
         $user->week = array('withdraw' => $weekWithdraw, 'transfer' => $weekTransfer, 'shoping' => $weekShoping);
@@ -67,4 +91,6 @@ class Mobile extends Controller
         $user->activity = $activity;
         return response()->json($user, 200);
     }
+
+
 }

@@ -3,13 +3,35 @@ part of vallet;
 class MainState extends State<Main> {
   List<Widget> trans = [];
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  WebSocketChannel webSocketChannel;
+  PusherService pusherService = PusherService();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return new AlertDialog(
+          title: Text("Limit or Low Budget"),
+          content: Text("Demo Version"),
+        );
+      },
+    );
+    }
+
+    @override
+    void dispose() { 
+      pusherService.unbindEvent('App\\Events\\NewMessageNotification');
+
+      super.dispose();
+    }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+        pusherService = PusherService();
+
+    pusherService.firePusher('notification', 'App\\Events\\NewMessageNotification');
+    trans.clear();
     for (var i = 0; i < user["transactionsCount"]; i++) {
       var aTran = ListTile(
         leading: Image.network(
@@ -18,17 +40,62 @@ class MainState extends State<Main> {
           height: 100,
         ),
         title: Text(user["transactions"][i]["name"]),
-        trailing: Text('-'+user["transactions"][i]["money"].toString()+"\$"),
-        subtitle: Text(user["transactions"][i]["cardNumber"], style: TextStyle(fontSize: 10),),
+        trailing:
+            Text('-' + user["transactions"][i]["money"].toString() + "\$"),
+        subtitle: Text(
+          user["transactions"][i]["cardNumber"],
+          style: TextStyle(fontSize: 10),
+        ),
       );
       trans.add(aTran);
     }
+    super.initState();
+
+        var initializationSettingsAndroid =
+        new AndroidInitializationSettings('app_icon'); 
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+
+
+    pusherService.eventStream.listen((data){
+              _showNotificationWithDefaultSound();
+
+        });
+
+
+  }
+
+Future _showNotificationWithDefaultSound() async {
+  var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      'your channel id', 'your channel name', 'your channel description',
+      importance: Importance.Max, priority: Priority.High);
+  var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+  var platformChannelSpecifics = new NotificationDetails(
+      androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    'Limit or Low Budget',
+    'How to Show Notification in Vallet',
+    platformChannelSpecifics,
+    payload: 'Default_Sound',
+  );
+}
+
+  @override
+  Widget build(BuildContext context) {
+
+        
+        
     var data = [
-      new SpendPerCategory('Withdraw', user["today"]["withdraw"],
+      new SpendPerCategory('Withdraw', user["today"]["withdraw"].toInt(),
           Color.fromRGBO(177, 153, 251, 1)),
-      new SpendPerCategory('Shoping', user["today"]["shoping"],
+      new SpendPerCategory('Shoping', user["today"]["shoping"].toInt(),
           Color.fromRGBO(161, 196, 252, 1)),
-      new SpendPerCategory('Transfer', user["today"]["transfer"],
+      new SpendPerCategory('Transfer', user["today"]["transfer"].toInt(),
           Color.fromRGBO(100, 229, 229, 1)),
     ];
 
@@ -47,9 +114,6 @@ class MainState extends State<Main> {
 
     var chart = new charts.BarChart(series,
         animate: true,
-        barRendererDecorator: new charts.BarLabelDecorator<String>(
-            insideLabelStyleSpec:
-                charts.TextStyleSpec(color: charts.Color.white)),
         primaryMeasureAxis: new charts.NumericAxisSpec(
             renderSpec: new charts.NoneRenderSpec()));
 
@@ -62,7 +126,6 @@ class MainState extends State<Main> {
     );
 
     double width = MediaQuery.of(context).size.width - 50;
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: new AppBar(
           title: new Text(''),
@@ -113,53 +176,66 @@ class MainState extends State<Main> {
                   },
                   child: Center(
                       child: Container(
-                    height: 160,
+                    decoration: new BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(40)),
+                      color: Color.fromRGBO(50, 50, 50, 1),
+                    ),
+                    height: 200,
                     width: width,
                     child: Card(
-                      elevation: 10,
+                      color: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(35.0),
+                      ),
+                      elevation: 0,
                       child: Stack(
                         children: <Widget>[
-                          Container(
-                            width: width,
-                            child: Image.network(
-                              "https://st4.depositphotos.com/2060305/22518/v/600/depositphotos_225182764-stock-video-dynamic-animation-smooth-gradient-background.jpg",
-                              fit: BoxFit.fill,
-                            ),
-                          ),
                           Positioned(
-                            left: 5,
+                            top: 10,
+                            left: 15,
                             child: Text(
                               "Vallet",
                               style: TextStyle(
-                                  fontSize: 30, fontFamily: "Lobster"),
+                                  color: Color.fromRGBO(220, 220, 220, 1),
+                                  fontSize: 30,
+                                  fontFamily: "SF",
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                           Positioned(
-                            left: 15,
-                            bottom: 5,
+                            top: 30,
+                            right: 30,
+                            child: Image.asset(
+                              "resource/card.png",
+                              width: 50,
+                            ),
+                          ),
+                          Positioned(
+                            left: 20,
+                            bottom: 10,
                             child: Container(
                                 width: width,
                                 child: Text(
                                   "Mr. " + user["fullname"],
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
+                                      color: Color.fromRGBO(235, 235, 235, 1),
                                       fontSize: 18,
-                                      fontWeight: FontWeight.w600),
+                                      fontWeight: FontWeight.w400),
                                 )),
                           ),
                           Positioned(
-                            top: 75,
+                            top: 120,
+                            right: 18,
                             child: Container(
-                              width: width,
-                              child: Center(
-                                  child: Text(
-                                "TOTAL BALANCE: " + user["totalBalance"] + "\$",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              )),
+                              child: Text(
+                                  "\$"+user["totalBalance"].toStringAsFixed(2),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color.fromRGBO(255, 255, 255, .85),
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "SF",
+                                  )),
                             ),
                           )
                         ],
@@ -187,11 +263,10 @@ class MainState extends State<Main> {
                               );
                             },
                             child: Text(
-                              "Latest Activity",
+                              "Activity",
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
@@ -209,7 +284,7 @@ class MainState extends State<Main> {
                 )),
                 Container(
                   width: width,
-                  height: 200,
+                  height: 400,
                   child: Card(
                     elevation: 6,
                     child: Stack(
@@ -217,12 +292,20 @@ class MainState extends State<Main> {
                         Positioned(
                           top: 5,
                           left: 10,
-                          child: Text(
-                            "Latest Transactions",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (context) => Transaction()),
+                              );
+                            },
+                            child: Text(
+                              "Transactions",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         ),
@@ -243,4 +326,5 @@ class MainState extends State<Main> {
           ),
         ));
   }
+  
 }

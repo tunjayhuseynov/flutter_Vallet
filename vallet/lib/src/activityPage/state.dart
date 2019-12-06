@@ -9,15 +9,15 @@ class ActivityState extends State<Activity> {
   static int withdraw;
   static int shoping;
   static int transfer;
-  static int dailyWithdraw = user["today"]["withdraw"];
-  static int dailyShoping = user["today"]["shoping"];
-  static int dailyTransfer = user["today"]["transfer"];
-  static int weeklyWithdraw = user["week"]["withdraw"];
-  static int weeklyShoping = user["week"]["shoping"];
-  static int weeklyTransfer = user["week"]["transfer"];
-  static int monthlyWithdraw = user["month"]["withdraw"];
-  static int monthlyShoping = user["month"]["shoping"];
-  static int monthlyTransfer = user["month"]["transfer"];
+  static int dailyWithdraw = user["today"]["withdraw"].toInt();
+  static int dailyShoping = user["today"]["shoping"].toInt();
+  static int dailyTransfer = user["today"]["transfer"].toInt();
+  static int weeklyWithdraw = user["week"]["withdraw"].toInt();
+  static int weeklyShoping = user["week"]["shoping"].toInt();
+  static int weeklyTransfer = user["week"]["transfer"].toInt();
+  static int monthlyWithdraw = user["month"]["withdraw"].toInt();
+  static int monthlyShoping = user["month"]["shoping"].toInt();
+  static int monthlyTransfer = user["month"]["transfer"].toInt();
 
   Map<int, Function> process = <int, Function>{
     0: () {
@@ -91,7 +91,7 @@ class ActivityState extends State<Activity> {
             automaticallyImplyLeading: true,
             title: Text(
               'Activity',
-              style: TextStyle(color: Colors.black, fontFamily: "Lobster"),
+              style: TextStyle(color: Colors.black, fontFamily: "SF", fontWeight: FontWeight.w400),
             ),
             elevation: 0,
             backgroundColor: Colors.white,

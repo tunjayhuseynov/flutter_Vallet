@@ -120,13 +120,19 @@ class _MyDialogState extends State<MyDialog> {
       ),
       actions: <Widget>[
         new FlatButton(
-          child: new Text('CANCEL'),
+          child: new Text(
+            'CANCEL',
+            style: TextStyle(color: Color.fromRGBO(100, 100, 100, 1)),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
         FlatButton(
-          child: Text("PROCESS"),
+          child: Text(
+            "PROCESS",
+            style: TextStyle(color: Color.fromRGBO(100, 100, 100, 1)),
+          ),
           onPressed: () => print("PROCESSING VIA API"),
         )
       ],
@@ -157,8 +163,11 @@ class WalletsState extends State<Wallets> {
             centerTitle: true,
             automaticallyImplyLeading: true,
             title: Text(
-              'Wallets',
-              style: TextStyle(color: Colors.black, fontFamily: "Lobster"),
+              'MyVallets',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: "SF",
+                  fontWeight: FontWeight.w500),
             ),
             elevation: 0,
             backgroundColor: Colors.white,
@@ -174,15 +183,16 @@ class WalletsState extends State<Wallets> {
             child: Container(
                 width: width,
                 child: ListView.builder(
-                  itemCount: 2 + 1,
+                  itemCount: user["countcards"] + 1,
                   itemBuilder: (BuildContext ctxt, int index) {
-                    return index == 2
+                    return index == user["countcards"]
                         ? Center(
                             child: IconButton(
                               onPressed: () => _displayAddingDialog(context),
                               icon: Icon(
                                 Icons.add_circle,
                                 color: Colors.blueGrey,
+                                size: 40.0,
                               ),
                             ),
                           )
@@ -196,33 +206,44 @@ class WalletsState extends State<Wallets> {
                                   children: <Widget>[
                                     Container(
                                       width: width,
-                                      child: Image.network(
-                                        "https://st4.depositphotos.com/2060305/22518/v/600/depositphotos_225182764-stock-video-dynamic-animation-smooth-gradient-background.jpg",
-                                        fit: BoxFit.fill,
+                                      decoration: new BoxDecoration(
+                                        border: Border.all(width: 2),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(40)),
+                                        color: Color.fromRGBO(255, 255, 255, 1),
                                       ),
                                     ),
                                     Positioned(
-                                      left: 5,
+                                      top: 10,
+                                      left: 20,
                                       child: Image.network(
-                                        "http://rookie.az/wp-content/uploads/2018/08/Pasha-Bank1s.png",
+                                        user["cards"][index]["bankLogo"],
                                         height: 30,
+                                        color: Color.fromRGBO(100, 100, 100, 1),
                                       ),
                                     ),
                                     Positioned(
-                                      top: -4,
-                                      right: 5,
-                                      child: Image.network(
-                                        "https://seeklogo.net/wp-content/uploads/2016/11/visa-logo-preview.png",
-                                        height: 40,
+                                      top: 10,
+                                      right: 20,
+                                      child: Text(
+                                        user["cards"][index]["name"],
+                                        style: TextStyle(
+                                            color: Color.fromRGBO(
+                                                100, 100, 100, 1),
+                                            fontSize: 20,
+                                            fontFamily: "SF",
+                                            fontWeight: FontWeight.w700),
                                       ),
                                     ),
                                     Positioned(
-                                      left: 15,
-                                      bottom: 5,
+                                      left: 20,
+                                      bottom: 15,
                                       child: Container(
                                           width: width,
                                           child: Text(
-                                            "Mr. Tuncay Huseynov",
+                                            "Mr. " +
+                                                user["cards"][index]
+                                                    ["cardName"],
                                             textAlign: TextAlign.start,
                                             style: TextStyle(
                                                 color: Colors.black87,
@@ -231,19 +252,36 @@ class WalletsState extends State<Wallets> {
                                           )),
                                     ),
                                     Positioned(
-                                      top: 75,
+                                      top: 90,
                                       child: Container(
                                         width: width,
                                         child: Center(
                                             child: Text(
-                                          "1456 7894 6541 1234",
+                                          user["cards"][index]["cardNumber"],
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
+                                            letterSpacing: 1.2,
                                             color: Colors.black,
                                             fontSize: 20,
-                                            fontWeight: FontWeight.w800,
+                                            fontWeight: FontWeight.w300,
                                           ),
                                         )),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 15,
+                                      right: 20,
+                                      child: Container(
+                                        child: 
+                                            Text(
+                                          "\$"+user["cards"][index]["totalAmount"].toString(),
+                                          style: TextStyle(
+                                            letterSpacing: 1.2,
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w300,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -251,22 +289,38 @@ class WalletsState extends State<Wallets> {
                                 back: Stack(
                                   children: <Widget>[
                                     Container(
-                                      width: width,
-                                      child: Image.network(
-                                        "https://st4.depositphotos.com/2060305/22518/v/600/depositphotos_225182764-stock-video-dynamic-animation-smooth-gradient-background.jpg",
-                                        fit: BoxFit.fill,
+                                      decoration: new BoxDecoration(
+                                        border: Border.all(width: 2),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(40)),
+                                        color: Color.fromRGBO(100, 100, 100, 1),
                                       ),
+                                      width: width,
                                     ),
                                     Positioned(
                                       top: 65,
                                       left: 50,
                                       child: RaisedButton(
-                                        color: Colors.black12,
-                                        onPressed: () => print("s"),
-                                        child: Text(
-                                          "Operation",
-                                          style: TextStyle(
-                                            color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              new BorderRadius.circular(18.0),
+                                        ),
+                                        color: Colors.black45,
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  OperationList()),
+                                        ),
+                                        child: Container(
+                                          width: 70,
+                                          child: Center(
+                                            child: Text(
+                                              "Operation",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -275,12 +329,25 @@ class WalletsState extends State<Wallets> {
                                       top: 65,
                                       right: 50,
                                       child: RaisedButton(
-                                        color: Colors.black12,
-                                        onPressed: () => print("s"),
-                                        child: Text("History",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            )),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(18.0)),
+                                        color: Colors.black45,
+                                        onPressed: () => Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                                builder: (context) => History(
+                                                    user["cards"][index]
+                                                        ["cardNumber"]))),
+                                        child: Container(
+                                          width: 70,
+                                          child: Center(
+                                            child: Text("History",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                )),
+                                          ),
+                                        ),
                                       ),
                                     )
                                   ],
